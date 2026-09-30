@@ -64,6 +64,8 @@
       </div>
     </section>
 
+    <!-- Everything below the first screen is built one frame later (splits the start-up work in two). -->
+    <template v-if="restReady">
     <!-- ============ Services as a menu list ============ -->
     <section v-if="services.length" class="section-y s-bg">
       <div class="container-app">
@@ -339,11 +341,12 @@
     </section>
 
     <CtaBand />
+    </template>
   </FrontendLayout>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, nextTick, onMounted, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import FrontendLayout from '@/Layouts/FrontendLayout.vue';
 import QuoteForm from '@/Components/Site/QuoteForm.vue';
@@ -352,6 +355,18 @@ import Stars from '@/Components/Site/Stars.vue';
 import WhatsAppButton from '@/Components/Site/WhatsAppButton.vue';
 import { img, srcset } from '@/utils/img';
 import { statsFrom } from '@/utils/stats';
+
+const restReady = ref(false);
+onMounted(() => {
+  requestAnimationFrame(() => setTimeout(async () => {
+    restReady.value = true;
+    // A link such as /#quote points into the part that was just built.
+    if (location.hash.length > 1) {
+      await nextTick();
+      document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView();
+    }
+  }));
+});
 
 const props = defineProps({
   hero: { type: Object, default: () => ({}) },

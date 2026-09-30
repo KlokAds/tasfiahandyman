@@ -3,6 +3,7 @@
 @import '@fontsource-variable/dm-sans/wght.css';
 @import '@fontsource-variable/archivo/wdth.css';
 @import './tokens.css';
+@import './selectbox.css';
 @import './admin.css';
 @import './admin-theme.css';
 
