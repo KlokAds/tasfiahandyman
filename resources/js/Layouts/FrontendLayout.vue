@@ -37,11 +37,12 @@
 
     <!-- Header -->
     <header :class="['sticky top-0 z-50 transition-shadow', scrolled ? 'shadow-[var(--s-shadow)]' : '']" style="background: var(--s-bg); border-bottom: 1px solid var(--s-border)">
-      <div class="container-app h-[4.5rem] flex items-center justify-between gap-4">
-        <Link href="/" class="flex items-center gap-3 shrink-0" aria-label="Home">
-          <img :src="img(company.logo, 128)" alt="" width="48" height="48" class="w-12 h-12 object-contain dark:bg-white dark:rounded-full dark:p-1" />
-          <span class="leading-none">
-            <span class="block text-[16px] font-extrabold uppercase s-heading" style="font-family: var(--font-display); font-stretch: 112%; letter-spacing: 0.01em">{{ brandMain }}</span>
+      <div class="container-app h-[4.5rem] flex items-center justify-between gap-2 sm:gap-4">
+        <!-- The brand may shrink (long names are cut with "…") so the buttons always fit, even on 320 px phones. -->
+        <Link href="/" class="flex items-center gap-2 min-[360px]:gap-2.5 sm:gap-3 min-w-0" aria-label="Home">
+          <img :src="img(company.logo, 128)" alt="" width="48" height="48" class="w-9 h-9 min-[360px]:w-10 min-[360px]:h-10 sm:w-12 sm:h-12 shrink-0 object-contain dark:bg-white dark:rounded-full dark:p-1" />
+          <span class="leading-none min-w-0">
+            <span class="block truncate text-[12.5px] min-[360px]:text-[14px] sm:text-[16px] font-extrabold uppercase s-heading [font-stretch:100%] min-[360px]:[font-stretch:112%] min-[360px]:tracking-[0.01em]" style="font-family: var(--font-display)">{{ brandMain }}</span>
             <span class="mt-1 flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.2em] s-accent"><span class="w-3 h-[3px] bg-[#ffc21a]"></span>{{ brandSub }}</span>
           </span>
         </Link>
@@ -82,7 +83,7 @@
           <Link v-for="item in primaryAfter" :key="item.href" :href="item.href" :class="navClass(item.href)">{{ item.label }}</Link>
         </nav>
 
-        <div class="flex items-center gap-1.5 sm:gap-2">
+        <div class="flex items-center gap-0.5 min-[360px]:gap-1.5 sm:gap-2 shrink-0">
           <button type="button" @click="searchOpen = true" class="btn btn-ghost btn-sm !px-2.5" aria-label="Search the website" title="Search (Ctrl K)">
             <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 21l-5.2-5.2M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" /></svg>
           </button>

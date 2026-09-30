@@ -7,7 +7,7 @@
       <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(11,31,56,0.93) 0%, rgba(11,31,56,0.84) 55%, rgba(11,31,56,0.97) 100%)"></div>
 
       <div class="relative container-app pt-14 pb-10 lg:pt-20 text-center">
-        <p v-if="hero.eyebrow" class="eyebrow !text-[#ffc21a] justify-center">{{ hero.eyebrow }}</p>
+        <p v-if="hero.eyebrow" class="eyebrow !text-[#ffc21a] justify-center max-[400px]:!text-[0.64rem] max-[400px]:!tracking-[0.06em]">{{ hero.eyebrow }}</p>
         <h1 class="h-display !text-white mt-4 max-w-4xl mx-auto">{{ hero.title || `Handyman services in Singapore` }}</h1>
         <p v-if="hero.subtitle" class="mt-5 text-[1.12rem] leading-relaxed text-white/75 max-w-2xl mx-auto">{{ hero.subtitle }}</p>
 

@@ -90,7 +90,7 @@
         display: inline-flex; align-items: center; gap: 0.5rem;
         font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--s-accent-text);
     }
-    .site .eyebrow::before { content: ''; width: 0.95rem; height: 0.42rem; background: var(--s-yellow); transform: skewX(-24deg); }
+    .site .eyebrow::before { content: ''; flex-shrink: 0; width: 0.95rem; height: 0.42rem; background: var(--s-yellow); transform: skewX(-24deg); }
     .site .h-display {
         font-family: var(--font-display); font-weight: 800; font-stretch: 108%; letter-spacing: -0.025em; line-height: 1.04;
         font-size: clamp(2.15rem, 4.9vw, 3.8rem); color: var(--s-heading);

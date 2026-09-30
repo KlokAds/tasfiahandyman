@@ -14,9 +14,9 @@
     </PageHero>
 
     <section class="section-y s-bg">
-      <div :class="['container-app grid gap-10 lg:gap-14 items-start', groups.length > 1 ? 'lg:grid-cols-[15rem_minmax(0,1fr)]' : 'lg:grid-cols-[minmax(0,1fr)_17rem]']">
+      <div :class="['container-app grid grid-cols-1 gap-10 lg:gap-14 items-start', groups.length > 1 ? 'lg:grid-cols-[15rem_minmax(0,1fr)]' : 'lg:grid-cols-[minmax(0,1fr)_17rem]']">
         <!-- Category index (sticky on desktop, scrolling chips on phones) -->
-        <nav :class="['lg:sticky lg:top-28', groups.length > 1 ? '' : 'order-2']" aria-label="Service categories">
+        <nav :class="['min-w-0 lg:sticky lg:top-28', groups.length > 1 ? '' : 'order-2']" aria-label="Service categories">
           <template v-if="groups.length > 1">
             <p class="hidden lg:block text-[11px] font-bold uppercase tracking-[0.14em] s-subtle mb-3">Categories</p>
             <div class="flex lg:flex-col gap-2 lg:gap-0.5 overflow-x-auto pb-1 lg:pb-0" style="scrollbar-width: none">
