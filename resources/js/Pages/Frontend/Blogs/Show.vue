@@ -9,16 +9,16 @@
     <header class="s-dark relative overflow-hidden">
       <div class="absolute inset-0 grid-bg opacity-70"></div>
       <div :class="['relative container-app pt-8 lg:pt-12', blog.image ? 'pb-28 lg:pb-32' : 'pb-10 lg:pb-12']">
-        <div class="max-w-[46rem]">
+        <div class="max-w-[66rem]">
           <nav class="crumbs !text-white/55" aria-label="Breadcrumb">
             <Link href="/" class="hover:!text-white">Home</Link><span class="sep">/</span>
             <Link href="/blogs" class="hover:!text-white">Articles</Link>
             <template v-if="blog.primary_service"><span class="sep">/</span><Link :href="`/service/${blog.primary_service.slug}`" class="hover:!text-white">{{ blog.primary_service.name }}</Link></template>
           </nav>
           <Link v-if="blog.primary_service" :href="`/blogs?service=${blog.primary_service.slug}`" class="mt-5 inline-flex eyebrow !text-[#ffc21a]">{{ blog.primary_service.name }}</Link>
-          <h1 class="h-page !text-white mt-3">{{ blog.name }}</h1>
+          <h1 class="h-page !text-white mt-3 [text-wrap:balance]">{{ blog.name }}</h1>
 
-          <div class="mt-7 flex flex-wrap items-center justify-between gap-4">
+          <div class="mt-7 max-w-[46rem] flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <img v-if="author.image" :src="img(author.image, 96)" :alt="author.name" class="w-11 h-11 rounded-full object-cover" />
               <span v-else class="w-11 h-11 rounded-full bg-white text-[#0b1b30] text-[13px] font-bold flex items-center justify-center">{{ initials }}</span>
