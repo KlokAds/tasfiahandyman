@@ -30,7 +30,7 @@
             </div>
             <div>
               <p class="eyebrow">Latest guide</p>
-              <h2 class="h-section !text-[1.7rem] mt-3 group-hover:text-[var(--s-accent-text)] transition-colors">{{ lead.name }}</h2>
+              <h2 class="h-section !text-[1.7rem] mt-3 group-hover:text-[var(--s-accent-text)] transition-colors">{{ cleanTitle(lead.name) }}</h2>
               <p v-if="lead.excerpt" class="mt-3 s-muted leading-relaxed line-clamp-3">{{ lead.excerpt }}</p>
               <p class="mt-4 text-[13px] s-subtle">{{ date(lead.published_at) }}</p>
             </div>
@@ -60,6 +60,7 @@ import WhatsAppButton from '@/Components/Site/WhatsAppButton.vue';
 import ArticleRow from '@/Components/Site/ArticleRow.vue';
 import SitePagination from '@/Components/Site/SitePagination.vue';
 import { img, srcset } from '@/utils/img';
+import { cleanTitle } from '@/utils/cleanTitle';
 
 const props = defineProps({ blogs: Object, filters: { type: Object, default: () => ({}) }, services: { type: Array, default: () => [] }, breadcrumb: Object });
 const q = ref(props.filters?.search || '');

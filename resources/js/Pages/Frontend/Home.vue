@@ -320,7 +320,7 @@
               <img :src="latestBlogs[0].image ? img(latestBlogs[0].image, 960) : '/logo.png'" :alt="latestBlogs[0].name" class="img-cover group-hover:scale-[1.03] transition-transform duration-500" loading="lazy" decoding="async" />
             </div>
             <p class="mt-4 text-[12.5px] s-subtle">{{ date(latestBlogs[0].published_at) }}</p>
-            <h3 class="h-section !text-[1.5rem] mt-1 group-hover:text-[var(--s-accent-text)] transition-colors">{{ latestBlogs[0].name }}</h3>
+            <h3 class="h-section !text-[1.5rem] mt-1 group-hover:text-[var(--s-accent-text)] transition-colors">{{ cleanTitle(latestBlogs[0].name) }}</h3>
             <p v-if="latestBlogs[0].excerpt" class="mt-2 s-muted line-clamp-2">{{ latestBlogs[0].excerpt }}</p>
           </Link>
           <ul class="divide-y s-divide border-y s-border">
@@ -331,7 +331,7 @@
                 </span>
                 <span class="min-w-0">
                   <span class="block text-[12px] s-subtle">{{ date(b.published_at) }}</span>
-                  <span class="h-card !text-[15px] mt-1 line-clamp-2 group-hover:text-[var(--s-accent-text)] transition-colors">{{ b.name }}</span>
+                  <span class="h-card !text-[15px] mt-1 line-clamp-2 group-hover:text-[var(--s-accent-text)] transition-colors">{{ cleanTitle(b.name) }}</span>
                 </span>
               </Link>
             </li>
@@ -354,6 +354,7 @@ import CtaBand from '@/Components/Site/CtaBand.vue';
 import Stars from '@/Components/Site/Stars.vue';
 import WhatsAppButton from '@/Components/Site/WhatsAppButton.vue';
 import { img, srcset } from '@/utils/img';
+import { cleanTitle } from '@/utils/cleanTitle';
 import { statsFrom } from '@/utils/stats';
 
 const restReady = ref(false);

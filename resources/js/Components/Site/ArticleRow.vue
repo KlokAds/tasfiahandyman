@@ -8,7 +8,7 @@
         <span v-if="article.primary_service" class="s-accent font-semibold">{{ article.primary_service.name }} · </span>
         <time v-if="article.published_at" :datetime="article.published_at">{{ date(article.published_at) }}</time>
       </span>
-      <span class="h-card !text-[15.5px] mt-1 line-clamp-2 group-hover:text-[var(--s-accent-text)] transition-colors">{{ article.name }}</span>
+      <span class="h-card !text-[15.5px] mt-1 line-clamp-2 group-hover:text-[var(--s-accent-text)] transition-colors">{{ cleanTitle(article.name) }}</span>
       <span v-if="article.excerpt && !compact" class="mt-1.5 text-[13.5px] s-muted line-clamp-2 leading-relaxed">{{ article.excerpt }}</span>
     </span>
   </Link>
@@ -17,6 +17,7 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
 import { img } from '@/utils/img';
+import { cleanTitle } from '@/utils/cleanTitle';
 
 // An article as a list row: thumbnail left, date + title (+ excerpt) right.
 defineProps({ article: { type: Object, required: true }, compact: Boolean });

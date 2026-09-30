@@ -1,0 +1,1 @@
+function e(e=``){let t=String(e).trim(),n=t.replace(/(?:\s*[-–|]|\s+by)\s*Tasfia(\s+[\w&]+){0,3}\s*:\s*/i,`: `).replace(/\s*(?:[-–|:]|\s(?:by|and|from))\s*Tasfia(\s+[\w&]+){0,3}\s*$/i,``).replace(/\s+Tasfia\s+Handyman(\s+Service)?\s*$/i,``).replace(/\s*[|]\s*Handyman\s+Services?\s+Singapore\s*$/i,``).trim();return n.length>=12?n:t}export{e as t};
