@@ -162,8 +162,8 @@
     <!-- ============ Quote: contact panel + form ============ -->
     <section id="quote" class="pb-16 lg:pb-24 s-bg">
       <div class="container-app">
-        <div class="grid lg:grid-cols-[0.9fr_1.1fr] rounded-xl overflow-hidden border s-border" style="box-shadow: var(--s-shadow-lg)">
-          <div class="s-dark relative p-7 sm:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] rounded-xl overflow-hidden border s-border" style="box-shadow: var(--s-shadow-lg)">
+          <div class="s-dark relative min-w-0 p-5 min-[360px]:p-7 sm:p-10">
             <div class="absolute inset-0 grid-bg opacity-70"></div>
             <div class="relative">
               <p class="eyebrow !text-[#ffc21a]">Free quote</p>
@@ -190,7 +190,7 @@
               <WhatsAppButton class="mt-8" green>Send photos on WhatsApp</WhatsAppButton>
             </div>
           </div>
-          <div class="s-surface p-7 sm:p-10">
+          <div class="s-surface min-w-0 p-5 min-[360px]:p-7 sm:p-10">
             <template v-if="hero.show_quote_form">
               <h3 class="h-card !text-[1.25rem]">What needs fixing?</h3>
               <p v-if="texts.quote_intro" class="text-[13.5px] s-subtle mt-1 mb-6">{{ texts.quote_intro }}</p>
@@ -247,8 +247,8 @@
           </div>
           <Link href="/reviews" class="btn btn-light shrink-0">Read all reviews</Link>
         </div>
-        <div class="grid lg:grid-cols-[1.25fr_1fr] gap-6">
-          <figure class="relative rounded-xl bg-white/[0.05] border border-white/10 p-8 sm:p-10">
+        <div class="grid grid-cols-1 lg:grid-cols-[1.25fr_1fr] gap-6">
+          <figure class="relative min-w-0 break-words rounded-xl bg-white/[0.05] border border-white/10 p-6 min-[360px]:p-8 sm:p-10">
             <span class="absolute -top-5 left-8 w-12 h-12 rounded-md bg-[#1670b3] text-white flex items-center justify-center text-[2.4rem] leading-none font-black" style="font-family: var(--font-display)" aria-hidden="true">“</span>
             <Stars :value="featured.rating" class="mt-2" />
             <blockquote class="mt-4 text-[1.2rem] sm:text-[1.35rem] leading-relaxed text-white font-medium">{{ featured.text }}</blockquote>
@@ -260,7 +260,7 @@
               </div>
             </figcaption>
           </figure>
-          <ul class="space-y-3">
+          <ul class="space-y-3 min-w-0">
             <li v-for="(r, i) in reviews.items.slice(1)" :key="i" class="rounded-xl bg-white/[0.04] border border-white/10 p-5">
               <div class="flex items-center justify-between gap-3">
                 <p class="font-bold text-white text-[14.5px] truncate">{{ r.name }}</p>

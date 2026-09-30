@@ -7,8 +7,8 @@
       <div class="absolute inset-0 pegboard pointer-events-none"></div>
       <div class="relative container-app">
         <!-- Contact panel + form in one frame -->
-        <div class="grid lg:grid-cols-[0.85fr_1.15fr] rounded-xl overflow-hidden border s-border" style="box-shadow: var(--s-shadow-lg)">
-          <div class="s-dark relative p-7 sm:p-9">
+        <div class="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] rounded-xl overflow-hidden border s-border" style="box-shadow: var(--s-shadow-lg)">
+          <div class="s-dark relative min-w-0 break-words p-5 min-[360px]:p-7 sm:p-9">
             <div class="absolute inset-0 grid-bg opacity-70"></div>
             <div class="relative space-y-3">
               <p class="eyebrow !text-[#ffc21a]">Talk to us</p>
@@ -39,7 +39,7 @@
             </div>
           </div>
 
-          <div class="s-surface p-7 sm:p-9">
+          <div class="s-surface min-w-0 p-5 min-[360px]:p-7 sm:p-9">
             <h2 class="h-card !text-[1.3rem]">Prefer a form?</h2>
             <p class="mt-1 mb-6 s-muted text-[14.5px]">Fill this in once: we get it by email, and WhatsApp opens with your message ready to send.</p>
             <QuoteForm :services="services" subject="Contact page enquiry" submit-label="Send my request" id-prefix="contact" />
