@@ -50,13 +50,13 @@
             </component>
           </div>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link v-for="t in tiles" :key="t.href" :href="t.href" class="group rounded-lg border s-border hover:border-[var(--s-accent)] hover:bg-[var(--s-accent-soft)] px-4 py-3.5 flex items-center gap-3 transition-colors">
-              <span class="w-11 h-11 rounded-md bg-[var(--s-accent-soft)] group-hover:bg-[var(--s-accent)] text-[var(--s-accent-text)] group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
+            <Link v-for="t in tiles" :key="t.href" :href="t.href" class="group rounded-lg border s-border hover:border-[var(--s-accent)] hover:bg-[var(--s-accent-soft)] px-3 py-3 sm:px-4 sm:py-3.5 flex flex-col items-start sm:flex-row sm:items-center gap-2 sm:gap-3 transition-colors">
+              <span class="w-9 h-9 sm:w-11 sm:h-11 rounded-md bg-[var(--s-accent-soft)] group-hover:bg-[var(--s-accent)] text-[var(--s-accent-text)] group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" :d="t.icon" /></svg>
               </span>
               <span class="min-w-0">
                 <span class="block text-[15px] font-bold s-heading leading-tight" style="font-family: var(--font-display)">{{ t.label }}</span>
-                <span class="block text-[12.5px] s-subtle truncate">{{ t.name }}</span>
+                <span class="block text-[13px] leading-snug s-subtle mt-0.5" :title="t.name">{{ t.blurb }}</span>
               </span>
             </Link>
           </div>
@@ -405,16 +405,16 @@ const steps = computed(() => [1, 2, 3].map((n) => ({ title: texts.value[`step${n
 
 const phoneIcon = 'M3 5a2 2 0 012-2h3.28a1 1 0 01.95.68l1.5 4.5a1 1 0 01-.5 1.2l-2.26 1.13a11 11 0 005.52 5.52l1.13-2.26a1 1 0 011.2-.5l4.5 1.5a1 1 0 01.68.95V19a2 2 0 01-2 2h-1C9.7 21 3 14.3 3 6V5z';
 
-// "What needs fixing?" tiles: one live service per trade, matched by name.
+// "What needs fixing?" tiles: one live service per trade, matched by name, with a short line on what it covers.
 const trades = [
-  { label: 'Plumbing', prefer: /^plumbing/i, re: /plumb|sink|tap|toilet|heater|bathtub|pipe/i, icon: 'M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z' },
-  { label: 'Electrical', prefer: /^electric/i, re: /electric|wiring|light|power/i, icon: 'M13 2L4 14h7l-1 8 9-12h-7l1-8z' },
-  { label: 'Doors', prefer: /^door repair/i, re: /door|hinge|roller|frame/i, icon: 'M6 21V4a1 1 0 011-1h10a1 1 0 011 1v17M4 21h16M14 12h.01' },
-  { label: 'Painting', prefer: /^painting/i, re: /paint|plaster/i, icon: 'M4 4h13v5H4zM17 6.5h2.5V12H11v3M10 15h2v6h-2z' },
-  { label: 'Carpentry', prefer: /^furniture/i, re: /cabinet|drawer|furniture|wardrobe|wood/i, icon: 'M4 4h16v16H4zM4 12h16M10 8h4M10 16h4' },
-  { label: 'Locksmith', prefer: /^locksmith/i, re: /lock/i, icon: 'M6 11h12v10H6zM8 11V7a4 4 0 118 0v4' },
-  { label: 'Aircon', prefer: /^aircon/i, re: /aircon|air-con|air con/i, icon: 'M12 2v20M4.9 7l14.2 10M4.9 17L19.1 7M9 4l3 2 3-2M9 20l3-2 3 2' },
-  { label: 'Tiling', prefer: /^tile/i, re: /tile|tiling|silicon/i, icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
+  { label: 'Plumbing', blurb: 'Taps, sinks, toilets, heaters', prefer: /^plumbing/i, re: /plumb|sink|tap|toilet|heater|bathtub|pipe/i, icon: 'M12 3s6 6.5 6 11a6 6 0 01-12 0c0-4.5 6-11 6-11z' },
+  { label: 'Electrical', blurb: 'Wiring, lighting, power points', prefer: /^electric/i, re: /electric|wiring|light|power/i, icon: 'M13 2L4 14h7l-1 8 9-12h-7l1-8z' },
+  { label: 'Doors', blurb: 'Doors, hinges, rollers', prefer: /^door repair/i, re: /door|hinge|roller|frame/i, icon: 'M6 21V4a1 1 0 011-1h10a1 1 0 011 1v17M4 21h16M14 12h.01' },
+  { label: 'Painting', blurb: 'Painting and plastering', prefer: /^painting/i, re: /paint|plaster/i, icon: 'M4 4h13v5H4zM17 6.5h2.5V12H11v3M10 15h2v6h-2z' },
+  { label: 'Carpentry', blurb: 'Cabinets, drawers, furniture', prefer: /^furniture/i, re: /cabinet|drawer|furniture|wardrobe|wood/i, icon: 'M4 4h16v16H4zM4 12h16M10 8h4M10 16h4' },
+  { label: 'Locksmith', blurb: 'Lock repair and change', prefer: /^locksmith/i, re: /lock/i, icon: 'M6 11h12v10H6zM8 11V7a4 4 0 118 0v4' },
+  { label: 'Aircon', blurb: 'Repair and replacement', prefer: /^aircon/i, re: /aircon|air-con|air con/i, icon: 'M12 2v20M4.9 7l14.2 10M4.9 17L19.1 7M9 4l3 2 3-2M9 20l3-2 3 2' },
+  { label: 'Tiling', blurb: 'Tiles and silicone', prefer: /^tile/i, re: /tile|tiling|silicon/i, icon: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z' },
 ];
 const tiles = computed(() => {
   const list = props.serviceOptions.filter((s) => s.slug);
@@ -424,7 +424,7 @@ const tiles = computed(() => {
     const s = free.find((x) => t.prefer.test(x.name)) || free.find((x) => t.re.test(x.name));
     if (!s) return null;
     used.add(s.id);
-    return { label: t.label, name: s.name, icon: t.icon, href: `/service/${s.slug}` };
+    return { label: t.label, blurb: t.blurb, name: s.name, icon: t.icon, href: `/service/${s.slug}` };
   }).filter(Boolean);
 });
 </script>
