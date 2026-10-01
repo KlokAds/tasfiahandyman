@@ -288,7 +288,8 @@
       </div>
 
       <!-- Large outlined wordmark -->
-      <p ref="footerMark" class="footer-mark container-app select-none" aria-hidden="true"><span>{{ brandMain }}</span></p>
+      <!-- Decorative: the text comes from CSS (::before), so it is not read out or checked as body text -->
+      <p ref="footerMark" class="footer-mark container-app select-none" aria-hidden="true"><span :data-text="brandMain"></span></p>
 
       <div class="relative border-t border-white/10">
         <div class="container-app py-5 flex flex-col sm:flex-row justify-between gap-3 text-[12.5px] text-white/55">
@@ -449,12 +450,14 @@ const fitFooterMark = () => {
     el.style.fontSize = `${parseFloat(cs.fontSize) * (room / text.offsetWidth) * 0.98}px`;
   }
 };
+// Measured once the fonts are in (not during start-up), and again after a resize settles.
+let fitTimer = null;
+const fitSoon = () => { clearTimeout(fitTimer); fitTimer = setTimeout(() => requestAnimationFrame(fitFooterMark), 150); };
 onMounted(() => {
-  fitFooterMark();
-  document.fonts?.ready.then(fitFooterMark);
-  window.addEventListener('resize', fitFooterMark);
+  (document.fonts?.ready || Promise.resolve()).then(() => requestAnimationFrame(fitFooterMark));
+  window.addEventListener('resize', fitSoon);
 });
-onBeforeUnmount(() => window.removeEventListener('resize', fitFooterMark));
+onBeforeUnmount(() => { window.removeEventListener('resize', fitSoon); clearTimeout(fitTimer); });
 watch(() => brandMain.value, () => requestAnimationFrame(fitFooterMark));
 onBeforeUnmount(() => document.removeEventListener('click', trackClick, true));
 

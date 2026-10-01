@@ -268,6 +268,7 @@
         font-size: clamp(1rem, 6.2vw, 6.2rem); line-height: 0.8; letter-spacing: -0.01em; margin-bottom: -0.12em;
         color: transparent; -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
     }
+    .site .footer-mark span::before { content: attr(data-text); }
 
     /* ---------- Misc ---------- */
     .site .grid-bg { background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.4px, transparent 1.6px); background-size: 22px 22px; }
