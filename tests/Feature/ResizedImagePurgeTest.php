@@ -17,7 +17,12 @@ class ResizedImagePurgeTest extends TestCase
         file_put_contents(public_path('cache/img/1280/Admin/purge-test/wall-repair.jpg.webp'), 'x');
         file_put_contents("$dir/other.jpg.webp", 'x');
 
+        // The current folder too
+        File::ensureDirectoryExists(public_path('cache/w/640/Admin/purge-test'));
+        file_put_contents(public_path('cache/w/640/Admin/purge-test/wall-repair.jpg.webp'), 'x');
+
         ImageController::purge('Admin/purge-test/wall-repair.jpg');
+        $this->assertFileDoesNotExist(public_path('cache/w/640/Admin/purge-test/wall-repair.jpg.webp'));
 
         $this->assertFileDoesNotExist("$dir/wall-repair.jpg.webp");
         $this->assertFileDoesNotExist(public_path('cache/img/1280/Admin/purge-test/wall-repair.jpg.webp'));
@@ -25,6 +30,13 @@ class ResizedImagePurgeTest extends TestCase
 
         File::deleteDirectory(public_path('cache/img/640/Admin/purge-test'));
         File::deleteDirectory(public_path('cache/img/1280/Admin/purge-test'));
+        File::deleteDirectory(public_path('cache/w/640/Admin/purge-test'));
+    }
+
+    public function test_old_links_redirect_to_the_current_folder(): void
+    {
+        $this->get('/cache/img/640/Admin/x/door.jpg.webp')->assertRedirect('/cache/w/640/Admin/x/door.jpg.webp');
+        $this->get('/cache/img/641/Admin/x/door.jpg.webp')->assertNotFound();
     }
 
     public function test_purge_ignores_paths_that_try_to_leave_the_cache_folder(): void

@@ -93,7 +93,7 @@
                 <span class="block h-card !text-[16px] group-hover:text-[var(--s-accent-text)] transition-colors">{{ s.name }}</span>
                 <span v-if="s.short_summary" class="mt-1 text-[13.5px] s-muted line-clamp-1">{{ s.short_summary }}</span>
               </span>
-              <span v-if="s.from_price" class="badge-price shrink-0 hidden sm:inline-flex"><span class="text-[11px] font-medium s-subtle">from</span> S${{ Number(s.from_price).toLocaleString() }}</span>
+              <span v-if="s.from_price" class="badge-price shrink-0 hidden sm:inline-flex"><span class="text-[11px] font-medium s-subtle">from</span> S${{ groupDigits(s.from_price) }}</span>
               <span class="w-9 h-9 rounded-full border s-border flex items-center justify-center shrink-0 group-hover:bg-[#ffc21a] group-hover:border-[#ffc21a] group-hover:text-[#0b1b30] transition-colors">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
               </span>
@@ -346,6 +346,7 @@
 </template>
 
 <script setup>
+import { groupDigits, shortDate } from '@/utils/fmt';
 import { computed, nextTick, onMounted, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import FrontendLayout from '@/Layouts/FrontendLayout.vue';
@@ -397,7 +398,7 @@ const company = computed(() => page.props.company || {});
 const tel = computed(() => company.value.tel || '');
 const topLocations = computed(() => page.props.topLocations || []);
 const isInternal = href => !href || href.startsWith('/');
-const date = d => (d ? new Date(d).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' }) : '');
+const date = d => (d ? shortDate(d) : '');
 
 const texts = computed(() => page.props.company?.texts || {});
 // Admin → Website text → Homepage: How it works (a step without a title is hidden).

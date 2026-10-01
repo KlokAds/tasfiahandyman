@@ -53,7 +53,7 @@ class ResponsiveImage
         $w = collect(ImageController::WIDTHS)->first(fn ($x) => $x >= $width) ?? max(ImageController::WIDTHS);
 
         // Encoded, so a file name with spaces cannot break a srcset or be read as two links.
-        return '/cache/img/' . $w . '/' . self::encodePath($p) . '.webp';
+        return '/' . ImageController::DIR . '/' . $w . '/' . self::encodePath($p) . '.webp';
     }
 
     public static function srcset(?string $path, int $max = 1600): ?string
@@ -64,7 +64,7 @@ class ResponsiveImage
         }
 
         return collect(ImageController::WIDTHS)->filter(fn ($w) => $w >= 320 && $w <= $max)
-            ->map(fn ($w) => '/cache/img/' . $w . '/' . self::encodePath($p) . ".webp {$w}w")->join(', ');
+            ->map(fn ($w) => '/' . ImageController::DIR . '/' . $w . '/' . self::encodePath($p) . ".webp {$w}w")->join(', ');
     }
 
     /** Ask the layout to preload this image (call from the controller). */

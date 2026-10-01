@@ -15,11 +15,12 @@
 </template>
 
 <script setup>
+import { shortDate } from '@/utils/fmt';
 import { Link } from '@inertiajs/vue3';
 import { img } from '@/utils/img';
 import { cleanTitle } from '@/utils/cleanTitle';
 
 // An article as a list row: thumbnail left, date + title (+ excerpt) right.
 defineProps({ article: { type: Object, required: true }, compact: Boolean });
-const date = d => new Date(d).toLocaleDateString('en-SG', { day: 'numeric', month: 'short', year: 'numeric' });
+const date = d => shortDate(d);
 </script>
