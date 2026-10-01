@@ -110,9 +110,10 @@
         </div>
 
         <!-- Desktop sidebar -->
-        <aside class="hidden lg:block">
+        <!-- With a cover photo the sidebar starts level with the photo (both overlap the dark header). -->
+        <aside :class="['hidden lg:block', blog.image ? 'lg:-mt-32' : '']">
           <div class="sticky top-24 space-y-6">
-            <nav v-if="toc.length > 2" aria-label="On this page">
+            <nav v-if="toc.length > 2" aria-label="On this page" class="card p-5" style="box-shadow: var(--s-shadow)">
               <p class="text-[11.5px] font-bold uppercase tracking-[0.12em] s-subtle mb-3">On this page</p>
               <ol class="border-l s-border max-h-[calc(100vh-26rem)] overflow-y-auto" style="scrollbar-width: thin">
                 <li v-for="h in toc" :key="h.id">
