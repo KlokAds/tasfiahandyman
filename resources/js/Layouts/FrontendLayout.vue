@@ -287,7 +287,7 @@
       </div>
 
       <!-- Large outlined wordmark -->
-      <p class="footer-mark container-app select-none" aria-hidden="true">{{ brandMain }}</p>
+      <p ref="footerMark" class="footer-mark container-app select-none" aria-hidden="true"><span>{{ brandMain }}</span></p>
 
       <div class="relative border-t border-white/10">
         <div class="container-app py-5 flex flex-col sm:flex-row justify-between gap-3 text-[12.5px] text-white/55">
@@ -434,6 +434,27 @@ function trackClick(e) {
   (window.dataLayer = window.dataLayer || []).push({ event, link_url: href, page_path: location.pathname });
 }
 onMounted(() => document.addEventListener('click', trackClick, true));
+
+// Footer wordmark: shrink the font so a long brand name fits the container instead of being cut off.
+const footerMark = ref(null);
+const fitFooterMark = () => {
+  const el = footerMark.value;
+  if (!el) return;
+  el.style.fontSize = '';
+  const text = el.firstElementChild;
+  const cs = getComputedStyle(el);
+  const room = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+  if (text && room > 0 && text.offsetWidth > room) {
+    el.style.fontSize = `${parseFloat(cs.fontSize) * (room / text.offsetWidth) * 0.98}px`;
+  }
+};
+onMounted(() => {
+  fitFooterMark();
+  document.fonts?.ready.then(fitFooterMark);
+  window.addEventListener('resize', fitFooterMark);
+});
+onBeforeUnmount(() => window.removeEventListener('resize', fitFooterMark));
+watch(() => brandMain.value, () => requestAnimationFrame(fitFooterMark));
 onBeforeUnmount(() => document.removeEventListener('click', trackClick, true));
 
 // Search: header button, Ctrl/Cmd+K or "/"
