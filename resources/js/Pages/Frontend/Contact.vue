@@ -8,9 +8,10 @@
       <div class="relative container-app">
         <!-- Contact panel + form in one frame -->
         <div class="grid grid-cols-1 lg:grid-cols-[0.85fr_1.15fr] rounded-xl overflow-hidden border s-border" style="box-shadow: var(--s-shadow-lg)">
-          <div class="s-dark relative min-w-0 break-words p-5 min-[360px]:p-7 sm:p-9">
+          <!-- On desktop the form is taller: the contact options sit in the middle of the panel -->
+          <div class="s-dark relative min-w-0 break-words p-5 min-[360px]:p-7 sm:p-9 lg:flex lg:flex-col lg:justify-center">
             <div class="absolute inset-0 grid-bg opacity-70"></div>
-            <div class="relative space-y-3">
+            <div class="relative space-y-3 lg:w-full">
               <p class="eyebrow !text-[#ffc21a]">Talk to us</p>
               <h2 class="h-section !text-white !text-[1.6rem]">The quickest ways to reach us</h2>
 
