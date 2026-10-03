@@ -30,6 +30,9 @@
     .admin-ui .a-side .a-scroll { scrollbar-color: rgba(255, 255, 255, 0.18) transparent; }
     .admin-ui .a-side .a-panel-3 { background: rgba(255, 255, 255, 0.1); }
     .admin-ui .a-side .a-muted { color: rgba(255, 255, 255, 0.7); }
+    /* The open page has a white row: its count pills turn dark so they stay readable. */
+    .admin-ui .a-side .a-nav-item.is-active .a-panel-3 { background: #e7eef7; }
+    .admin-ui .a-side .a-nav-item.is-active .a-muted { color: #0b1b30; }
 
     /* ---------- Canvas and headings ---------- */
     .admin-ui main {
