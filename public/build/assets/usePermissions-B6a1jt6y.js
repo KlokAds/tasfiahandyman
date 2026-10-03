@@ -1,0 +1,1 @@
+import{a as e,v as t}from"./app-BI2BPe6H.js";function n(){let n=e(),r=t(()=>n.props.admin?.can||{}),i=e=>!!r.value[e];return{can:i,canAny:(...e)=>e.some(i)}}export{n as t};
