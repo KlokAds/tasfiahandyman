@@ -77,6 +77,20 @@ return [
         'batch_size' => 50,        // approved decisions run per "Run batch" (App\Support\AuditBatch)
     ],
 
+    // Area pages (Admin → Locations, `php artisan locations:towns`): this site's trade, in plain words.
+    'location_pages' => [
+        'title' => 'Handyman',
+        'brand' => 'Handyman Service SG',
+        'short' => 'repairs and installations for doors, plumbing, lights, painting, tiles and furniture',
+        'work' => [
+            'hdb' => 'In HDB flats we fix doors and sliding doors, taps and sinks, lights and wiring, water heaters, tiles and painting, and assemble furniture.',
+            'condo' => 'In condominiums we handle sliding and wardrobe doors, shower door hinges, lighting, water heaters, aircon repairs and furniture assembly.',
+            'landed' => 'For landed homes we take on painting and plastering, tiles, wiring and lighting, plumbing, doors and aircon on every floor.',
+            'commercial' => 'For shops and offices we do repairs and installations: doors, lighting and wiring, plumbing, painting and furniture assembly.',
+        ],
+        'quote' => 'Send us photos and a short note of the job through the form on this page or on WhatsApp. We reply with a price and the earliest time we can come.',
+    ],
+
     // Byline on articles that have no author of their own and no default author: the team.
     'team_byline' => [
         'title' => 'Handyman specialists, Singapore',
