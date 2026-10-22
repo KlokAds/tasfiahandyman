@@ -4,8 +4,13 @@
  * The admin has its own entry: resources/css/admin-app.css.
  */
 @import 'tailwindcss' source(none);
-@import '@fontsource-variable/dm-sans/wght.css';
-@import '@fontsource-variable/archivo/wdth.css';
+@import '@fontsource/barlow/400.css';
+@import '@fontsource/barlow/500.css';
+@import '@fontsource/barlow/600.css';
+@import '@fontsource/barlow/700.css';
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/barlow-condensed/800.css';
 @import './tokens.css';
 @import './site.css';
 @import './selectbox.css';

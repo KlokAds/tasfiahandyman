@@ -144,8 +144,8 @@
 
     @if ($isPublicPage)
         {{-- Start downloading the two text fonts with the page, so text never shifts when they arrive. --}}
-        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ Vite::asset('node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2') }}">
-        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ Vite::asset('node_modules/@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2') }}">
+        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ Vite::asset('node_modules/@fontsource/barlow/files/barlow-latin-400-normal.woff2') }}">
+        <link rel="preload" as="font" type="font/woff2" crossorigin href="{{ Vite::asset('node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff2') }}">
     @endif
     {{-- The current page's own code is preloaded too, instead of waiting for app.js to ask for it. --}}
     @vite([$isPublicPage ? 'resources/css/app.css' : 'resources/css/admin-app.css', 'resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
