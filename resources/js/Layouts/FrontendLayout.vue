@@ -40,7 +40,7 @@
     <header :class="['sticky top-0 z-50 transition-shadow', scrolled ? 'shadow-[var(--s-shadow)]' : '']" style="background: var(--s-bg); border-bottom: 1px solid var(--s-border)">
       <div class="container-app h-[4.5rem] flex items-center justify-between gap-2 sm:gap-4">
         <!-- The brand may shrink (long names are cut with "…") so the buttons always fit, even on 320 px phones. -->
-        <Link href="/" class="flex items-center gap-2 min-[360px]:gap-2.5 sm:gap-3 min-w-0" aria-label="Home">
+        <Link href="/" class="flex items-center gap-2 min-[360px]:gap-2.5 sm:gap-3 min-w-0 xl:shrink-0" aria-label="Home">
           <img :src="img(company.logo, 128)" alt="" width="48" height="48" class="w-9 h-9 min-[360px]:w-10 min-[360px]:h-10 sm:w-12 sm:h-12 shrink-0 object-contain dark:bg-white dark:rounded-full dark:p-1" />
           <span class="leading-none min-w-0">
             <span class="block truncate text-[12.5px] min-[360px]:text-[14px] sm:text-[16px] font-extrabold uppercase s-heading [font-stretch:100%] min-[360px]:[font-stretch:112%] min-[360px]:tracking-[0.01em]" style="font-family: var(--font-display)">{{ brandMain }}</span>
@@ -50,7 +50,7 @@
 
         <!-- Desktop nav -->
         <nav class="hidden xl:flex items-center gap-0.5" aria-label="Main">
-          <Link v-for="item in primaryBefore" :key="item.href" :href="item.href" :class="navClass(item.href)">{{ item.label }}</Link>
+          <Link v-for="item in primaryBefore.filter(i => i.href !== '/')" :key="item.href" :href="item.href" :class="navClass(item.href)">{{ item.label }}</Link>
 
           <div class="relative" @mouseenter="openMenu('services')" @mouseleave="closeMenuSoon">
             <button type="button" :class="[navClass('/services'), 'inline-flex items-center gap-1']" :aria-expanded="open === 'services'" aria-haspopup="true" @click="toggle('services')">
