@@ -88,12 +88,8 @@
           <button type="button" @click="searchOpen = true" class="btn btn-ghost btn-sm !px-2.5" aria-label="Search the website" title="Search (Ctrl K)">
             <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 21l-5.2-5.2M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" /></svg>
           </button>
-          <a v-if="company.tel" :href="'tel:' + tel" class="hidden sm:inline-flex 2xl:hidden btn btn-ghost btn-sm !px-2.5" aria-label="Call us">
+          <a v-if="company.tel" :href="'tel:' + tel" class="hidden sm:inline-flex btn btn-ghost btn-sm !px-2.5" :aria-label="'Call ' + company.phone" :title="company.phone">
             <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" :d="icons.phone" /></svg>
-          </a>
-          <a v-if="company.tel" :href="'tel:' + tel" class="hidden 2xl:inline-flex btn btn-navy btn-sm">
-            <svg class="w-4 h-4 text-[#ffc21a]" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" :d="icons.phone" /></svg>
-            {{ company.phone }}
           </a>
           <WhatsAppButton size="sm" class="hidden sm:inline-flex">Get a free quote</WhatsAppButton>
           <button type="button" @click="mobileOpen = !mobileOpen" class="xl:hidden btn btn-ghost btn-sm !px-2.5" :aria-expanded="mobileOpen" aria-label="Menu">
@@ -117,7 +113,7 @@
               </div>
               <div class="relative mt-5 space-y-2">
                 <Link href="/services" class="btn btn-primary btn-sm w-full" @click="open = null">All {{ serviceCount }} services</Link>
-                <Link v-if="hasPrices" href="/pricing" class="btn btn-light btn-sm w-full" @click="open = null">Price list</Link>
+                <Link href="/pricing" class="btn btn-light btn-sm w-full" @click="open = null">Pricing</Link>
               </div>
             </div>
 
@@ -181,7 +177,7 @@
               </div>
               <div class="p-3 grid grid-cols-2 gap-2 border-t border-white/10">
                 <Link href="/services" class="btn btn-light btn-sm" @click="mobileOpen = false">All services</Link>
-                <Link v-if="hasPrices" href="/pricing" class="btn btn-light btn-sm" @click="mobileOpen = false">Price list</Link>
+                <Link href="/pricing" class="btn btn-light btn-sm" @click="mobileOpen = false">Pricing</Link>
               </div>
             </div>
           </div>
@@ -267,7 +263,7 @@
             </ul>
             <div class="mt-5 flex flex-wrap gap-2">
               <Link href="/services" class="btn btn-sm btn-light">All services</Link>
-              <Link v-if="hasPrices" href="/pricing" class="btn btn-sm btn-light">Price list</Link>
+              <Link href="/pricing" class="btn btn-sm btn-light">Pricing</Link>
             </div>
           </div>
 
@@ -371,9 +367,8 @@ const primaryBefore = [
   { label: 'Home', href: '/' },
   { label: 'About', href: '/about' },
 ];
-const hasPrices = computed(() => !!page.props.hasPrices);
 const primaryAfter = computed(() => [
-  ...(hasPrices.value ? [{ label: 'Pricing', href: '/pricing' }] : []),
+  { label: 'Pricing', href: '/pricing' },
   { label: 'Projects', href: '/projects' },
   { label: 'Articles', href: '/blogs' },
   { label: 'Contact', href: '/contact' },
