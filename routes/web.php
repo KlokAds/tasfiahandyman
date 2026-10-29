@@ -155,6 +155,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', \App\Http\Middleware
     Route::get('/', fn () => redirect()->route('admin.dashboard'));
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Bulk delete for every list (each item uses that list's own delete rules and permission).
+    // Content AI: the page itself only lets in the owner accounts in config/content_ai.php.
+    Route::get('/content-ai', [\App\Http\Controllers\Admin\ContentAiController::class, 'index'])->name('content-ai.index');
+    Route::post('/content-ai', [\App\Http\Controllers\Admin\ContentAiController::class, 'store'])->middleware('throttle:6,1')->name('content-ai.store');
     Route::get('/visitors', [\App\Http\Controllers\Admin\VisitorController::class, 'index'])->middleware('can:visitors.view')->name('visitors.index');
     Route::post('/visitors/daily-email', [\App\Http\Controllers\Admin\VisitorController::class, 'dailyEmail'])->middleware('can:visitors.view')->name('visitors.daily-email');
     Route::post('/bulk/{resource}/delete', [\App\Http\Controllers\Admin\BulkController::class, 'destroy'])->middleware('throttle:20,1')->name('bulk.delete');

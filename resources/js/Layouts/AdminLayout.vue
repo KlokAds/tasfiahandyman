@@ -246,6 +246,7 @@ const groups = computed(() => {
         { label: 'Price list', href: '/admin/pricing', can: 'pricing.view' },
         { label: 'FAQs', href: '/admin/faqs', can: 'faqs.view' },
       ] },
+      { label: 'Content AI', icon: 'doc', tabs: [{ label: 'Content AI', href: '/admin/content-ai', can: 'content_ai' }] },
       { label: 'Locations', icon: 'pin', count: c.locations, tabs: [{ label: 'Locations', href: '/admin/locations', can: 'locations.view' }] },
       { label: 'Projects', icon: 'briefcase', count: c.projects, tabs: [{ label: 'Projects', href: '/admin/projects', can: 'projects.view' }] },
       { label: 'Reviews', icon: 'star', count: c.reviews, tabs: [{ label: 'Reviews', href: '/admin/reviews', can: 'reviews.view' }] },

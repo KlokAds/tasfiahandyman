@@ -99,6 +99,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'can' => collect(\App\Support\Permissions::all())
                 ->mapWithKeys(fn ($p) => [$p => $request->user()->can($p)])
+                ->put('content_ai', \App\Support\ContentAi::allowed($request->user()))
                 ->all(),
             'brand' => \App\Models\SiteSetting::get('business.brand_name') ?: config('app.name'),
             'debug' => (bool) config('app.debug'),

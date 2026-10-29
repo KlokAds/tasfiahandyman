@@ -25,6 +25,13 @@ class ApiKeys
             'get' => 'brave.com/search/api → sign in → API keys.',
             'page' => ['Articles', '/admin/blogs?tab=review'],
         ],
+        'anthropic' => [
+            'setting' => 'content_ai.anthropic_key',
+            'label' => 'Anthropic (Claude) API key',
+            'used_for' => 'Content AI: draft articles and social captions from job photos.',
+            'get' => 'platform.claude.com → API keys → Create key.',
+            'page' => ['Content AI', '/admin/content-ai'],
+        ],
         'google_places' => [
             'setting' => 'reviews.google_api_key',
             'label' => 'Google Places API key',
