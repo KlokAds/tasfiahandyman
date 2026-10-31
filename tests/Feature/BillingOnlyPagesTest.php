@@ -37,6 +37,8 @@ class BillingOnlyPagesTest extends TestCase
             $this->get($page)->assertNotFound();
         }
         $this->post('/admin/messages-scan-spam')->assertNotFound();
+        // Content AI moved to the billing app's content tools.
+        $this->get('/admin/content-ai')->assertNotFound();
         $this->get('/admin/blogs')->assertOk();
     }
 
