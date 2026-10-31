@@ -54,3 +54,7 @@ Thumbs.db
 # Runtime state
 /storage/framework/migrate.lock
 /storage/framework/setup-state.json
+
+# Article rewrites waiting to be imported for review
+/storage/rewrites
+/tools/pylib
