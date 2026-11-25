@@ -360,27 +360,31 @@ def collect(client, state):
         for item in b["items"].values():
             by_site.setdefault(item[0], set()).add(item[1])
         source = {k: {a["id"]: a for a in articles(k) if a["id"] in ids} for k, ids in by_site.items()}
+        batch_written = batch_failed = 0
+        batch_cost = 0.0
         for result in client.messages.batches.results(b["id"]):
             site, aid = b["items"][result.custom_id]
             article = source.get(site, {}).get(aid)
             if result.result.type != "succeeded":
-                failed += 1
+                batch_failed += 1
                 print(f"  ! [{site}] #{aid}: {result.result.type}")
                 continue
             try:
                 data, cost, error = answer_of(result.result.message, BATCH_FACTOR)
             except (ValueError, KeyError) as e:
                 data, cost, error = None, cost_of(result.result.message.usage) * BATCH_FACTOR, f"bad answer: {e}"
-            cost_total += cost
+            batch_cost += cost
             if error or not data or not article:
-                failed += 1
+                batch_failed += 1
                 print(f"  ! [{site}] #{aid}: {error or 'article no longer in the export'}")
                 continue
             save_row(article, result_row(article, data, cost))
-            written += 1
-        b["collected"] = True
+            batch_written += 1
+        # Kept with the batch: the next batch's estimate uses the real cost of an article.
+        b.update({"collected": True, "written": batch_written, "failed": batch_failed, "cost": round(batch_cost, 4)})
         save_batch_state(state)
-        print(f"Batch {b['id']}: {written} saved, {failed} failed, ${cost_total:.2f}.")
+        written, failed, cost_total = written + batch_written, failed + batch_failed, cost_total + batch_cost
+        print(f"Batch {b['id']}: {batch_written} saved, {batch_failed} failed, ${batch_cost:.2f}.")
     return written, failed, cost_total
 
 
@@ -434,9 +438,14 @@ def main():
     print(f"Spent before this run: ${spent_before:.2f} of the ${args.budget:.2f} budget.")
 
     if args.batch:
-        # The cost of one article so far (direct calls), halved for the batch, plus 15% to be safe.
-        history = [r["cost"] for k in SITES for r in rows_of(out_path(k)) if r.get("cost")]
-        per_batch = (sum(history) / len(history) if history else 0.20) * BATCH_FACTOR * 1.15
+        # The real cost of an article in earlier batches, plus 3% to be safe; without one, the cost
+        # of a direct call halved, plus 15%.
+        done_batches = [b for b in state["batches"] if b.get("cost") and (b.get("written", 0) + b.get("failed", 0))]
+        if done_batches:
+            per_batch = sum(b["cost"] for b in done_batches) / sum(b["written"] + b["failed"] for b in done_batches) * 1.03
+        else:
+            history = [r["cost"] for k in SITES for r in rows_of(out_path(k)) if r.get("cost")]
+            per_batch = (sum(history) / len(history) if history else 0.20) * BATCH_FACTOR * 1.15
         room = max(0, int((args.budget - spent_before) // per_batch))
         if len(order) > room:
             order = order[:room]
