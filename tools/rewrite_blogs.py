@@ -14,6 +14,14 @@ Run:  python tools/rewrite_blogs.py --sites door,engineering,plumbing   (asks fo
 
 The budget (default $95) covers ALL sites together, including earlier runs; the script stops before
 it. Ctrl+C stops it; running it again continues where it left off.
+
+Batch mode (--batch): all the articles that fit the budget go to the Message Batches API at once, at
+half the price; results come within 24 hours (usually about an hour). The window can be closed while
+it waits: running the same command again collects the batch instead of sending a new one.
+
+Articles are read from storage/rewrites/<site>-articles.jsonl when it exists (an export of the live
+site's published articles, with the ones that already have an AI rewrite marked), else from the local
+database copy.
 """
 
 import argparse
@@ -181,15 +189,25 @@ def rows_of(path):
     return rows
 
 
+def export_path(key):
+    """The live site's published articles, exported to JSON lines (one article per line)."""
+    return Path(SITES[key]["root"]) / "storage" / "rewrites" / f"{key}-articles.jsonl"
+
+
 def articles(key):
-    con = sqlite3.connect(Path(SITES[key]["root"]) / "database" / "database.sqlite")
-    con.row_factory = sqlite3.Row
-    rows = con.execute(
-        """select b.id, b.slug, b.name, b.desc, s.name as service, s.slug as service_slug
-           from blog_details b left join service_details s on s.id = b.primary_service_id
-           where b.status = 'published'"""
-    ).fetchall()
-    con.close()
+    if export_path(key).exists():
+        # The live site's articles (the local database copy can be older); ones that already
+        # have an AI rewrite on the site (waiting or released) are left out.
+        rows = [r for r in rows_of(export_path(key)) if not r.get("rewritten")]
+    else:
+        con = sqlite3.connect(Path(SITES[key]["root"]) / "database" / "database.sqlite")
+        con.row_factory = sqlite3.Row
+        rows = con.execute(
+            """select b.id, b.slug, b.name, b.desc, s.name as service, s.slug as service_slug
+               from blog_details b left join service_details s on s.id = b.primary_service_id
+               where b.status = 'published'"""
+        ).fetchall()
+        con.close()
     items = []
     for r in rows:
         n = words(r["desc"])
@@ -228,29 +246,156 @@ def check(site, original, new):
     return problems
 
 
-def rewrite(client, article):
+def request_params(article):
+    """The request for one article (the same for a direct call and for a batch)."""
     site = SITES[article["site"]]
     service = f'\nRelated service page: {article["service"]} (/service/{article["service_slug"]})' if article["service"] else ""
     prompt = (
         f'Rewrite this article.\n\nTitle: {article["name"]}\nURL: /blogs/{article["slug"]}{service}\n'
         f'Current length: {article["words"]} words.\n\nCurrent article HTML:\n{article["desc"]}'
     )
+    return {
+        "model": MODEL,
+        "max_tokens": 16000,
+        "output_config": {"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
+        "system": [{"type": "text", "text": system_prompt(site), "cache_control": {"type": "ephemeral"}}],
+        "messages": [{"role": "user", "content": prompt}],
+    }
+
+
+def answer_of(message, factor=1.0):
+    """(data, cost, error) from a finished message."""
+    cost = cost_of(message.usage) * factor
+    if message.stop_reason == "refusal":
+        return None, cost, "declined by the model"
+    if message.stop_reason == "max_tokens":
+        return None, cost, "answer was cut off"
+    text = next((b.text for b in message.content if b.type == "text"), "")
+    return json.loads(text), cost, None
+
+
+def rewrite(client, article):
     response = client.beta.messages.create(
-        model=MODEL,
-        max_tokens=16000,
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
-        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-        system=[{"type": "text", "text": system_prompt(site), "cache_control": {"type": "ephemeral"}}],
-        messages=[{"role": "user", "content": prompt}],
+        **request_params(article),
     )
-    cost = cost_of(response.usage)
-    if response.stop_reason == "refusal":
-        return None, cost, "declined by the model"
-    if response.stop_reason == "max_tokens":
-        return None, cost, "answer was cut off"
-    text = next((b.text for b in response.content if b.type == "text"), "")
-    return json.loads(text), cost, None
+    return answer_of(response)
+
+
+def result_row(article, data, cost):
+    """The line written to the site's rewrites file (what the site imports)."""
+    return {
+        "id": article["id"],
+        "slug": article["slug"],
+        "name": article["name"],
+        "words_before": article["words"],
+        "words_after": words(data["desc"]),
+        "problems": check(SITES[article["site"]], article["desc"], data["desc"]),
+        "cost": round(cost, 4),
+        "payload": {
+            "desc": data["desc"],
+            "excerpt": data["excerpt"][:160],
+            "meta_desc": data["meta_desc"][:160],
+            "faqs": data["faqs"][:5],
+        },
+        "note": data["change_note"],
+    }
+
+
+def save_row(article, row):
+    path = out_path(article["site"])
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+
+# ---------------------------------------------------------------------------------------------
+# Batch mode: the articles go to the Message Batches API in one go (half the price of direct
+# calls; most batches finish within an hour, at most 24 hours). The batch is remembered in
+# BATCH_STATE, so closing the window and running again picks it up instead of sending a new one.
+
+BATCH_FACTOR = 0.5  # batch prices are half of the normal prices
+BATCH_STATE = Path(SITES["handyman"]["root"]) / "storage" / "rewrites" / "batches.json"
+
+
+def batch_state():
+    if BATCH_STATE.exists():
+        return json.loads(BATCH_STATE.read_text(encoding="utf-8"))
+    return {"batches": []}
+
+
+def save_batch_state(state):
+    BATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+    BATCH_STATE.write_text(json.dumps(state, indent=1), encoding="utf-8")
+
+
+def open_batch_ids(state):
+    """Articles already sent in a batch whose results are not saved yet: {site: {ids}}."""
+    sent = {}
+    for b in state["batches"]:
+        if not b.get("collected"):
+            for site, aid in b["items"].values():
+                sent.setdefault(site, set()).add(aid)
+    return sent
+
+
+def collect(client, state):
+    """Waits for the open batches and saves their results. Returns (written, failed, cost)."""
+    written = failed = 0
+    cost_total = 0.0
+    for b in state["batches"]:
+        if b.get("collected"):
+            continue
+        print(f"\nWaiting for batch {b['id']} ({len(b['items'])} articles, sent {b['sent']}).")
+        print("You can close this window; running it again continues from here.")
+        while True:
+            batch = client.messages.batches.retrieve(b["id"])
+            c = batch.request_counts
+            print(f"  {time.strftime('%H:%M')}  {batch.processing_status}: {c.succeeded} done, {c.processing} in progress, {c.errored} failed")
+            if batch.processing_status == "ended":
+                break
+            time.sleep(120)
+        by_site = {}
+        for item in b["items"].values():
+            by_site.setdefault(item[0], set()).add(item[1])
+        source = {k: {a["id"]: a for a in articles(k) if a["id"] in ids} for k, ids in by_site.items()}
+        for result in client.messages.batches.results(b["id"]):
+            site, aid = b["items"][result.custom_id]
+            article = source.get(site, {}).get(aid)
+            if result.result.type != "succeeded":
+                failed += 1
+                print(f"  ! [{site}] #{aid}: {result.result.type}")
+                continue
+            try:
+                data, cost, error = answer_of(result.result.message, BATCH_FACTOR)
+            except (ValueError, KeyError) as e:
+                data, cost, error = None, cost_of(result.result.message.usage) * BATCH_FACTOR, f"bad answer: {e}"
+            cost_total += cost
+            if error or not data or not article:
+                failed += 1
+                print(f"  ! [{site}] #{aid}: {error or 'article no longer in the export'}")
+                continue
+            save_row(article, result_row(article, data, cost))
+            written += 1
+        b["collected"] = True
+        save_batch_state(state)
+        print(f"Batch {b['id']}: {written} saved, {failed} failed, ${cost_total:.2f}.")
+    return written, failed, cost_total
+
+
+def send_batch(client, state, order):
+    from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+    from anthropic.types.messages.batch_create_params import Request
+
+    items = {f"{a['site']}-{a['id']}": [a["site"], a["id"]] for a in order}
+    batch = client.messages.batches.create(requests=[
+        Request(custom_id=f"{a['site']}-{a['id']}", params=MessageCreateParamsNonStreaming(**request_params(a)))
+        for a in order
+    ])
+    state["batches"].append({"id": batch.id, "sent": time.strftime("%Y-%m-%d %H:%M"), "items": items})
+    save_batch_state(state)
+    print(f"Sent batch {batch.id} with {len(order)} articles.")
 
 
 def main():
@@ -259,6 +404,7 @@ def main():
     parser.add_argument("--budget", type=float, default=95.0, help="stop before this many US$ for all sites together (default 95)")
     parser.add_argument("--workers", type=int, default=6, help="articles written at the same time (default 6)")
     parser.add_argument("--limit", type=int, default=0, help="rewrite at most this many in this run (default: no limit)")
+    parser.add_argument("--batch", action="store_true", help="send the articles as one batch (half price, results within 24 hours)")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -269,11 +415,14 @@ def main():
 
     # What every site has done before (all sites count against the one budget).
     spent_before = sum(r.get("cost", 0) for k in SITES for r in rows_of(out_path(k)))
+    state = batch_state()
+    sent = open_batch_ids(state)
     queues = {}
     for k in keys:
-        done = {r["id"] for r in rows_of(out_path(k))}
+        done = {r["id"] for r in rows_of(out_path(k))} | sent.get(k, set())
         queues[k] = [a for a in articles(k) if a["id"] not in done]
-        print(f"{SITES[k]['brand']}: {len(done)} done before, {len(queues[k])} to go")
+        waiting = f", {len(sent[k])} in a batch still running" if sent.get(k) else ""
+        print(f"{SITES[k]['brand']}: {len(done)} done before{waiting}, {len(queues[k])} to go")
     # Sites take turns, each with its neediest articles first.
     order = []
     while any(queues.values()):
@@ -284,6 +433,15 @@ def main():
         order = order[: args.limit]
     print(f"Spent before this run: ${spent_before:.2f} of the ${args.budget:.2f} budget.")
 
+    if args.batch:
+        # The cost of one article so far (direct calls), halved for the batch, plus 15% to be safe.
+        history = [r["cost"] for k in SITES for r in rows_of(out_path(k)) if r.get("cost")]
+        per_batch = (sum(history) / len(history) if history else 0.20) * BATCH_FACTOR * 1.15
+        room = max(0, int((args.budget - spent_before) // per_batch))
+        if len(order) > room:
+            order = order[:room]
+        print(f"Batch: about ${per_batch:.3f} per article; {len(order)} article(s) fit (about ${len(order) * per_batch:.2f}).")
+
     if args.dry_run:
         for a in order[:24]:
             print(f'  [{a["site"]:11}] need {a["need"]}  {a["words"]:5} words  {a["name"][:70]}')
@@ -293,6 +451,21 @@ def main():
     if not key:
         sys.exit("No key given.")
     client = anthropic.Anthropic(api_key=key, max_retries=8, timeout=600.0)
+
+    if args.batch:
+        try:
+            if not any(not b.get("collected") for b in state["batches"]):
+                if not order:
+                    sys.exit("Nothing to send: every article is done, or the budget is used up.")
+                send_batch(client, state, order)
+            written, failed, cost = collect(client, state)
+        except anthropic.AuthenticationError:
+            sys.exit("\nThe API key was refused. Check it and run again.")
+        except KeyboardInterrupt:
+            sys.exit("\nStopped. The batch keeps running at Anthropic; run this again to collect it.")
+        total = sum(r.get("cost", 0) for k in SITES for r in rows_of(out_path(k)))
+        print(f"\nFinished: {written} rewritten, {failed} failed, ${cost:.2f} this batch, ${total:.2f} in total (all runs).")
+        return
 
     spent, written, failed = spent_before, 0, 0
     per_article = 0.20  # replaced by the real average as articles finish
